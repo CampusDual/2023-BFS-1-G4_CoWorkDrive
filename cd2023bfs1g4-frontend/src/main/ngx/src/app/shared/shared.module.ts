@@ -1,21 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { OntimizeWebModule } from 'ontimize-web-ngx';
-import { FilterComponent } from './components/filters/filters.component';
-import { HomeToolbarComponent } from './components/home-toolbar/home-toolbar.component';
+import { OChartModule } from 'ontimize-web-ngx-charts';
 
 @NgModule({
   imports: [
-    OntimizeWebModule
+    OntimizeWebModule,
+    OChartModule
   ],
   declarations: [
-    FilterComponent,
-    HomeToolbarComponent
   ],
   exports: [
     CommonModule,
-    FilterComponent,
-    HomeToolbarComponent
+    OChartModule
   ]
 })
 export class SharedModule { }

@@ -1,0 +1,136 @@
+<o-form
+  title="{{ 'TRIP_INFORMATION' | oTranslate }}"
+  #formTrip
+  service="trips"
+  entity="tripDone"
+  keys="id_trip"
+  id="formTrip"
+  show-header="no"
+  class="formTripDetail"
+  (onDataLoaded)="hasBookings()"
+>
+  <o-row>
+    <o-column class="columnTripDetail">
+        <o-row>
+          <o-text-input
+            class="date-input"
+            title="{{ 'title_origin' | oTranslate }}"
+            attr="origin_title"
+            required="yes"
+            id="origin_title"
+            width="300px"
+            read-only="true"
+          ></o-text-input>
+          <o-text-input
+            class="date-input"
+            title="{{ 'origin_address' | oTranslate }}"
+            attr="origin_address"
+            required="yes"
+            id="origin_address"
+            width="300px"
+            read-only="true"
+          ></o-text-input>
+        </o-row>
+
+        <o-row>
+          <o-text-input
+            class="date-input"
+            title="{{ 'title_destination' | oTranslate }}"
+            attr="destination_title"
+            required="yes"
+            id="destination_title"
+            width="300px"
+            read-only="true"
+          ></o-text-input>
+          <o-text-input
+            class="date-input"
+            title="{{ 'destination_address' | oTranslate }}"
+            attr="destination_address"
+            required="yes"
+            id="destination_address"
+            width="300px"
+            read-only="true"
+          ></o-text-input>
+        </o-row>
+
+        <o-row>
+          <o-date-input
+            class="date-input"
+            title="{{ 'date' | oTranslate }}"
+            attr="date"
+            required="yes"
+            min={{minDate}}
+            max={{maxDate}}
+            id="date"
+            width="145px"
+            read-only="true"
+            value-type="STRING"
+            sql-type="VARCHAR"
+          ></o-date-input>
+
+          <o-hour-input
+            class="date-input"
+            title="{{ 'time' | oTranslate }}"
+            attr="time"
+            required="yes"
+            id="time"
+            width="145px"
+            read-only="true"
+          ></o-hour-input>
+
+          <o-combo 
+            class="date-input"
+            service="cars" 
+            entity="car" 
+            keys="id_car"
+            sql-type="INTEGER" 
+            attr="id_car" 
+            label="Car" 
+            value-column="id_car" 
+            columns="id_car;brand_name;model_name" 
+            visible-columns="brand_name;model_name"
+            required="yes" 
+            searchable="yes"
+            width="300px"
+            read-only="true"
+            ></o-combo>
+        </o-row>
+        <o-row style="height:100px">
+          <o-text-input
+            class="date-input"
+            title="{{ 'booking_users' | oTranslate }}"
+            attr="booking_users"
+            id="booking_users"
+            width="300px"
+            disabled="yes"
+            read-only="yes"
+            [hidden]="bookingsNumber>0 ? false : true"
+            read-only="true"
+          ></o-text-input>
+          <p class="date-input" [hidden]="bookingsNumber>0 ? true : false">{{ 'There were no bookings!' | oTranslate }}</p>
+          <o-text-input 
+            class="date-input rating" 
+            attr="rate"
+            read-only="true"
+            ></o-text-input>
+          <o-text-input 
+            class="date-input rating" 
+            attr="number_rates"
+            read-only="true"
+            ></o-text-input>
+        </o-row>
+        <o-text-input
+          class="date-input"
+          title="{{ 'id_trip' | oTranslate }}"
+          attr="id_trip"
+          required="yes"
+          id="id_trip"
+          width="300px"
+          oHidden
+        ></o-text-input>
+        <div class="ontimize-buttons">
+        <!-- <button title="{{ 'Reuse' | oTranslate }}" label="Reuse" (click)="reuseTrip()" layout-padding>{{ 'Reuse' | oTranslate }}</button ></o-form-layout-manager> -->
+        </div>
+    </o-column>
+  </o-row>
+</o-form>

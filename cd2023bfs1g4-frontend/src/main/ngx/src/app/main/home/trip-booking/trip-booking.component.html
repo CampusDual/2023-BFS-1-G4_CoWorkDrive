@@ -1,0 +1,161 @@
+<o-form 
+#formTrip
+  title="{{ 'BOOKING_INFORMATION' | oTranslate }}"
+  service="trips"
+  entity="booking"
+  keys="id_trip"
+  columns="origin_title;origin_address;destination_title;destination_address;date;time;free_seats;name;surnames;email;id_trip;brand_name;model_name;car_registration"
+  id="idForm"
+  show-header="no"
+  class="formTripDetail"
+  (onDataLoaded)="isBooking()"
+>
+  <o-row>
+    <o-column class="columnTripDetail">
+      <h3>{{ 'TRIP_INFORMATION' | oTranslate }}</h3>
+      <o-row class="rowTripDetail">
+        <o-text-input
+          class="info_title"
+          title="{{ 'origin_title' | oTranslate }}"
+          attr="origin_title"
+          id="origin_title"
+          read-only="true"
+        ></o-text-input>
+        <o-text-input
+          class="large-input"
+          title="{{ 'origin_address' | oTranslate }}"
+          attr="origin_address"
+          id="origin_address"
+          read-only="true"
+        ></o-text-input>
+      </o-row>
+
+      <o-row class="rowTripDetail">
+        <o-text-input
+          class="info_title"
+          title="{{ 'destination_title' | oTranslate }}"
+          attr="destination_title"
+          id="destination_title"
+          read-only="true"
+        ></o-text-input>
+        <o-text-input
+          class="large-input"
+          title="{{ 'destination_address' | oTranslate }}"
+          attr="destination_address"
+          id="destination_address"
+          read-only="true"
+        ></o-text-input>
+      </o-row>
+
+      <o-row class="rowTripDetail">
+        <o-date-input
+          class="carData-input"
+          title="{{ 'date' | oTranslate }}"
+          attr="date"
+          id="date"
+          read-only="true"
+        ></o-date-input>
+
+        <o-hour-input
+          class="carData-input"
+          title="{{ 'time' | oTranslate }}"
+          attr="time"
+          id="time"
+          read-only="true"
+        ></o-hour-input>
+
+        <o-text-input
+          title="{{ 'free_seats' | oTranslate }}"
+          attr="free_seats"
+          id="free_seats"
+          read-only="true"
+        ></o-text-input>
+      </o-row>
+      <h3>{{ 'DRIVER_INFORMATION' | oTranslate }}</h3>
+      <o-row class="rowTripDetail">
+        <o-text-input
+          class="dataDriver date-input"
+          title="{{ 'name' | oTranslate }}"
+          attr="name"
+          id="name"
+          read-only="true"
+        ></o-text-input>
+
+        <o-text-input
+          class="dataDriver date-input"
+          title="{{ 'surnames' | oTranslate }}"
+          attr="surnames"
+          id="surnames"
+          read-only="true"
+        ></o-text-input>
+        
+        <o-text-input
+          class="dataDriver"
+          title="{{ 'email' | oTranslate }}"
+          attr="email"
+          id="email"
+          read-only="true"
+          width="405px"
+        ></o-text-input>
+
+        <o-text-input
+          #idTrip
+          class="input-padding time-input"
+          title="{{ 'id_trip' | oTranslate }}"
+          attr="id_trip"
+          id="id_trip"
+          read-only="true"
+          oHidden
+        ></o-text-input>
+      </o-row>
+      <h3>{{ 'CAR_INFORMATION' | oTranslate }}</h3>
+      <o-row class="rowTripDetail">
+        <o-text-input
+          class="input-padding carData-input"
+          title="{{ 'brand_name' | oTranslate }}"
+          attr="brand_name"
+          id="brand_name"
+          read-only="true"
+        ></o-text-input>
+
+        <o-text-input
+          class="input-padding carData-input"
+          title="{{ 'model_name' | oTranslate }}"
+          attr="model_name"
+          id="model_name"
+          read-only="true"
+        ></o-text-input>
+
+        <o-text-input
+          class="input-padding"
+          title="{{ 'car_registration' | oTranslate }}"
+          attr="car_registration"
+          id="car_registration"
+          read-only="true"
+        ></o-text-input>
+      </o-row>
+    </o-column>
+  </o-row>
+  <br />
+<o-form 
+#formBooking
+class="formTripDetail"
+service="bookings"
+entity="booking"
+id="idFormBooking"
+columns="id_trip"
+header-actions="I"
+show-header="no">
+  <o-text-input
+      attr="id_trip"
+      oHidden
+  ></o-text-input>
+<button 
+  id="signUp"
+  title="{{ 'Sign Up' | oTranslate }}"
+  [hidden]="(valor==0 || numBooking>0) ? true : false" 
+  (click)="signUp()"
+  >{{ 'Sign Up' | oTranslate }}</button>
+  <p [hidden]="numBooking>0 ? false : true">{{ 'You have already registered for this trip!' | oTranslate}}</p>
+</o-form>
+</o-form>

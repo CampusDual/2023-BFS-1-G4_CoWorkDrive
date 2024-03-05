@@ -1,0 +1,161 @@
+<o-form
+  title="{{ 'TRIP_INFORMATION' | oTranslate }}"
+  #formTrip
+  service="trips"
+  entity="trip"
+  keys="id_trip"
+  id="formTrip"
+  show-header="no"
+  class="formTripDetail"
+  (onDataLoaded)="hasBookingsAndSetDestination()"
+  header-actions="D"
+>
+  <o-row>
+    <o-column class="columnTripDetail">
+        <o-row>
+          <o-text-input
+            class="date-input"
+            title="{{ 'title_origin' | oTranslate }}"
+            attr="origin_title"
+            required="yes"
+            id="origin_title"
+            width="300px"
+            placeholder="Santiago de Compostela"
+          ></o-text-input>
+          <o-text-input
+            class="date-input"
+            title="{{ 'origin_address' | oTranslate }}"
+            attr="origin_address"
+            required="yes"
+            id="origin_address"
+            width="300px"
+            placeholder="Santiago de Compostela"
+          ></o-text-input>
+        </o-row>
+
+        <o-row>
+          <o-combo 
+          class="date-input"
+          service="headquarters" 
+          entity="headquarter" 
+          keys="id_headquarter"
+          sql-type="INTEGER" 
+          attr="id_headquarter" 
+          label="Headquarter" 
+          id="id_headquarter"
+          value-column="id_headquarter" 
+          columns="id_headquarter;headquarter_destination_title;headquarter_destination_address;image_headquarter_name;headquarter_type" 
+          visible-columns="headquarter_destination_title"
+          required="yes" 
+          searchable="yes"
+          null-selection="no"
+          width="300px"
+          [enabled]="switchDestinationState? false : true"
+          (onChange)="setNewDestinationValues()"
+          >
+          </o-combo>
+          <o-slide-toggle class="date-input" #switchDestination id="switchDestination" attr="slidetoggle-editable" label="{{ 'Other destination' | oTranslate}}" read-only="no" (onValueChange)="getSwitchValue()"
+          ></o-slide-toggle>
+        </o-row>
+
+        <o-row style="display: flex; flex-direction: column; align-items: center;">
+          <o-text-input
+            class="date-input"
+            title="{{ 'title_destination' | oTranslate }}"
+            attr="destination_title"
+            required="yes"
+            id="destination_title"
+            width="300px"
+            placeholder="A Coruña"
+            [enabled]="switchDestinationState? true : false"
+          ></o-text-input>
+          <o-text-input
+            class="date-input"
+            title="{{ 'destination_address' | oTranslate }}"
+            attr="destination_address"
+            required="yes"
+            id="destination_address"
+            width="300px"
+            placeholder="A Coruña"
+            [enabled]="switchDestinationState? true : false"
+          ></o-text-input>
+        </o-row>
+
+        <o-row style="display: flex; justify-content: center;  align-items: center; height: 120px;">
+          <o-date-input
+            class="date-input"
+            title="{{ 'date' | oTranslate }}"
+            attr="date"
+            required="yes"
+            min={{minDate}}
+            max={{maxDate}}
+            id="date"
+            width="145px"
+            placeholder="12/31/2000"
+            value-type="STRING"
+            sql-type="VARCHAR"
+          ></o-date-input>
+
+          <o-hour-input
+            class="date-input"
+            title="{{ 'time' | oTranslate }}"
+            attr="time"
+            required="yes"
+            id="time"
+            width="145px"
+            placeholder="12:00"
+          ></o-hour-input>
+
+          <o-combo 
+            class="date-input"
+            service="cars" 
+            entity="carActive" 
+            keys="id_car"
+            sql-type="INTEGER" 
+            attr="id_car" 
+            label="Car" 
+            value-column="id_car" 
+            columns="id_car;brand_name;model_name" 
+            visible-columns="brand_name;model_name"
+            required="yes" 
+            searchable="yes"
+            null-selection="no"
+            width="300px">
+          </o-combo>
+        </o-row>
+        <o-row style="display: flex; justify-content: center; height:100px">
+          <o-text-input
+            class="date-input"
+            title="{{ 'booking_users' | oTranslate }}"
+            attr="booking_users"
+            id="booking_users"
+            width="300px"
+            disabled="yes"
+            read-only="yes"
+            [hidden]="bookingsNumber>0 ? false : true"
+          ></o-text-input>
+          <p [hidden]="bookingsNumber>0 ? true : false">{{ 'No bookings yet!' | oTranslate }}</p>
+        </o-row>
+        <o-text-input
+          class="date-input"
+          title="{{ 'id_trip' | oTranslate }}"
+          attr="id_trip"
+          required="yes"
+          id="id_trip"
+          width="300px"
+          placeholder="Santiago de Compostela"
+          oHidden
+        ></o-text-input>
+        <o-text-input
+        attr="destination_image"
+        id="destination_image"
+        oHidden
+        ></o-text-input>
+        <div class="ontimize-buttons">
+        <!-- <button title="{{ 'Reuse' | oTranslate }}" label="Reuse" (click)="reuseTrip()" layout-padding>{{ 'Reuse' | oTranslate }}</button ></o-form-layout-manager> -->
+          <button title="{{ 'Save' | oTranslate }}" label="Save" (click)="updateTrip()" layout-padding>{{ 'Save' | oTranslate }}</button >
+          <button title="{{ 'Delete' | oTranslate }}" label="Delete" (click)="deleteTrip()" layout-padding>{{ 'Delete' | oTranslate }}</button >
+        </div>
+    </o-column>
+  </o-row>
+</o-form>

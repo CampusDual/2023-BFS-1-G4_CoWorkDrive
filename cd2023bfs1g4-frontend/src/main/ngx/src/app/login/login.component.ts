@@ -1,11 +1,8 @@
-import { DomSanitizer } from '@angular/platform-browser';
-import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, Inject, Injector, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService, NavigationService, ServiceResponse, OUserInfoService } from 'ontimize-web-ngx';
+import { AuthService, LocalStorageService, NavigationService } from 'ontimize-web-ngx';
 import { Observable } from 'rxjs';
-import { MainService } from '../shared/services/main.service';
-import { UserInfoService } from '../shared/services/user-info.service';
 
 @Component({
   selector: 'login',
@@ -14,83 +11,77 @@ import { UserInfoService } from '../shared/services/user-info.service';
   encapsulation: ViewEncapsulation.None
 })
 export class LoginComponent implements OnInit {
-  public loginForm: UntypedFormGroup = new UntypedFormGroup({});
-  public userCtrl: UntypedFormControl = new UntypedFormControl('', Validators.required);
-  public pwdCtrl: UntypedFormControl = new UntypedFormControl('', Validators.required);
 
-  public sessionExpired = false;
-  private redirect = '/main';
+  // Defines the form and its controls
+  loginForm: FormGroup = new FormGroup({});
+  userCtrl: FormControl = new FormControl('', Validators.required);
+  pwdCtrl: FormControl = new FormControl('', Validators.required);
+
+  // Variable to control if the session has expired
+  sessionExpired = false;
+
+  router: Router;
 
   constructor(
     private actRoute: ActivatedRoute,
-    private router: Router,
-    @Inject(NavigationService) private navigationService: NavigationService,
+    router: Router,
+    @Inject(NavigationService) public navigation: NavigationService,
     @Inject(AuthService) private authService: AuthService,
-    @Inject(MainService) private mainService: MainService,
-    @Inject(OUserInfoService) private oUserInfoService: OUserInfoService,
-    @Inject(UserInfoService) private userInfoService: UserInfoService,
-    @Inject(DomSanitizer) private domSanitizer: DomSanitizer
+    @Inject(LocalStorageService) private localStorageService,
+    public injector: Injector
   ) {
+    this.router = router;
+
+    // Subscribes to changes in the URL parameters
     const qParamObs: Observable<any> = this.actRoute.queryParams;
     qParamObs.subscribe(params => {
       if (params) {
-        if (params['session-expired']) {
-          this.sessionExpired = (params['session-expired'] === 'true');
+        const isDetail = params['session-expired'];
+        if (isDetail === 'true') {
+          this.sessionExpired = true;
         } else {
-          if (params['redirect']) {
-            this.redirect = params['redirect'];
-          }
           this.sessionExpired = false;
         }
       }
     });
+
   }
 
   ngOnInit(): any {
-    this.navigationService.setVisible(false);
+    // Hides the navigation
+    this.navigation.setVisible(false);
 
+    // Adds the controls to the form
     this.loginForm.addControl('username', this.userCtrl);
     this.loginForm.addControl('password', this.pwdCtrl);
 
+    // Checks if the user is already logged in and performs the corresponding redirection
     if (this.authService.isLoggedIn()) {
-      this.router.navigate([this.redirect]);
+      this.router.navigate(['../'], { relativeTo: this.actRoute });
     } else {
       this.authService.clearSessionData();
     }
   }
 
-  public login() {
+  // Function to log in
+  login() {
     const userName = this.loginForm.value.username;
     const password = this.loginForm.value.password;
     if (userName && userName.length > 0 && password && password.length > 0) {
       const self = this;
+      // Calls the authentication service to authenticate the user
       this.authService.login(userName, password)
         .subscribe(() => {
           self.sessionExpired = false;
-          this.loadUserInfo();
-          self.router.navigate([this.redirect]);
+          // Redirects the user to the home page if the authentication is successful
+          self.router.navigate(['../'], { relativeTo: this.actRoute });
+          sessionStorage.setItem('userName', userName);
         }, this.handleError);
     }
   }
 
-  private loadUserInfo() {
-    this.mainService.getUserInfo()
-      .subscribe(
-        (result: ServiceResponse) => {
-          this.userInfoService.storeUserInfo(result.data);
-          let avatar = './assets/images/user_profile.png';
-          if (result.data['usr_photo']) {
-            (avatar as any) = this.domSanitizer.bypassSecurityTrustResourceUrl('data:image/*;base64,' + result.data['usr_photo']);
-          }
-          this.oUserInfoService.setUserInfo({
-            username: result.data['usr_name'],
-            avatar: avatar
-          });
-        }
-      );
-  }
-
-  private handleError(error) {
+  // Function to handle authentication errors
+  handleError(error) {
     switch (error.status) {
       case 401:
         console.error('Email or password is wrong.');
@@ -98,4 +89,5 @@ export class LoginComponent implements OnInit {
       default: break;
     }
   }
+
 }

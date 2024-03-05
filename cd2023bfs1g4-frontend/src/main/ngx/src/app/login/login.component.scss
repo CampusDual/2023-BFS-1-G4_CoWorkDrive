@@ -25,7 +25,7 @@
       background-image: url('^assets/images/login_bg.png');
       width: calc(100% - 640px);
       background-repeat: no-repeat;
-      background-size: cover;
+      background-size:cover;
       background-position: center;
       position: relative;
       z-index: 1;
@@ -152,4 +152,18 @@
       }
     }
   }
+}
+
+.divlogoapp{
+  position:absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top:50px;
+  margin-left:100px;
+}
+
+.logoapp{
+  height: 30%;
+  width: 30%;
 }
