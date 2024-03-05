@@ -13,9 +13,4 @@ public class ServerApplication {
 	public static void main(final String[] args) {
 		SpringApplication.run(ServerApplication.class, args);
 	}
-
-	@Bean
-	public IPasswordEncryptHelper passwordEncryptHelper() {
-		return new PasswordBCryptHelper();
-	}
 }

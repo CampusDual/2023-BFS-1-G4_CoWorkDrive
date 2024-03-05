@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<JdbcEntitySetup
+        xmlns="http://www.ontimize.com/schema/jdbc"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd"
+        catalog="" schema="${mainschema}" table="trip"
+        datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
+    <DeleteKeys>
+        <Column>id_trip</Column>
+    </DeleteKeys>
+    <UpdateKeys>
+        <Column>id_trip</Column>
+    </UpdateKeys>
+    <GeneratedKey>id_trip</GeneratedKey>
+    <Queries>
+        <Query id="all_trips">
+            <AmbiguousColumns>
+                <AmbiguousColumn name="id_user" prefix="t" />
+            </AmbiguousColumns>
+            <!--
+                The query retrieves all trips that meet the specified conditions.
+                It selects all columns from the trip table and free_seats from the difference between number of seats of a car and the bookings in this trip.
+                The WHERE clause filters trips based on the date being greater than or equal to the current date.
+            -->
+            <Sentence>
+                <![CDATA[
+                    SELECT (c.seats - count(b.id_trip)) as free_seats, t.*, tu.name, round(pr.rate, 1) as rate, pr.number_rates
+                    FROM trip t
+                    JOIN car c ON t.id_car = c.id_car
+                    JOIN tuser tu ON tu.user_ = t.id_user
+                    LEFT JOIN personal_ratings pr on pr.user_ = tu.user_
+                    LEFT JOIN booking b ON b.id_trip = t.id_trip
+                    #WHERE#
+                    AND date >= cast(now() as date) AND t.active = true
+                    GROUP BY c.seats, t.id_trip, tu.name, pr.rate, pr.number_rates
+                    HAVING (c.seats - count(b.id_trip)) > 0
+                ]]>
+            </Sentence>
+        </Query>
+
+        <Query id="get_user">
+            <!--
+                The query retrieves the user ID from the trip table based on the specified conditions.
+                It selects the id_user column from the trip table.
+                The WHERE clause filters the rows based on the provided conditions.
+            -->
+            <Sentence>
+                <![CDATA[
+             SELECT
+              id_user
+            FROM trip
+            #WHERE#
+           ]]>
+            </Sentence>
+        </Query>
+
+        <Query id="trip_data">
+            <!--
+                The query retrieves the user ID from the trip table based on the specified conditions.
+                It selects the id_user column from the trip table.
+                The WHERE clause filters the rows based on the provided conditions.
+            -->
+            <AmbiguousColumns>
+                <AmbiguousColumn name="id_trip" prefix="t" />
+                <AmbiguousColumn name="id_user" prefix="t" />
+            </AmbiguousColumns>
+            <Sentence>
+                <![CDATA[
+                     SELECT *, (SELECT string_agg(tu.name, ', ')
+                                  FROM booking b
+                                  JOIN tuser tu ON b.id_user = tu.user_
+                                  JOIN trip t ON b.id_trip = t.id_trip
+                                  #WHERE#) AS booking_users
+                    FROM trip t
+                    #WHERE#
+                        AND t.date >= CAST(now() as date) AND t.active = true
+                    ORDER BY date DESC
+                ]]>
+            </Sentence>
+        </Query>
+
+        <Query id="trip_data_done">
+            <!--
+                Retrieves completed trip data from the trip table when trips are completed.
+                It selects all columns from the trip table.
+                The WHERE clause filters the rows based on the provided conditions.
+                The query also includes a subquery to concatenate the names of the users who made bookings for the trip and ratings that they gave.
+            -->
+            <AmbiguousColumns>
+                <AmbiguousColumn name="id_trip" prefix="t" />
+                <AmbiguousColumn name="id_user" prefix="t" />
+            </AmbiguousColumns>
+            <Sentence>
+                <![CDATA[
+                     SELECT t.*, (SELECT string_agg(tu.name, ', ')
+                                  FROM booking b
+                                  JOIN tuser tu ON b.id_user = tu.user_
+                                  JOIN trip t ON b.id_trip = t.id_trip
+                                  #WHERE#) AS booking_users,
+                                  rpt.rate, rpt.number_rates
+                    FROM trip t
+                    LEFT JOIN booking bo ON bo.id_trip = t.id_trip
+                    JOIN ratings_per_trip rpt ON rpt.id_trip = t.id_trip
+                    #WHERE#
+                        AND t.date < CAST(now() as date)
+                    GROUP BY t.id_trip, t.id_user, rpt.rate, rpt.number_rates
+                    ORDER BY date desc
+                ]]>
+            </Sentence>
+        </Query>
+
+        <Query id="get_booking_users">
+            <AmbiguousColumns>
+                <AmbiguousColumn name="id_trip" prefix="b" />
+            </AmbiguousColumns>
+            <ValidColumns>
+                <Column>booking_users</Column>
+            </ValidColumns>
+            <!--
+                Retrieves the names of users who made bookings for a trip based on the specified conditions.
+                It selects the name column from the tuser table.
+                The WHERE clause filters the rows based on the provided conditions.
+            -->
+            <Sentence>
+                <![CDATA[
+                    SELECT tu.name as booking_users
+                    FROM booking b
+                    JOIN trip t ON t.id_trip = b.id_trip
+                    JOIN tuser tu ON b.id_user = tu.user_
+                    #WHERE#
+                ]]>
+            </Sentence>
+        </Query>
+
+        <Query id="booking_info">
+            <!--
+                Retrieves booking information for trips.
+                It selects various columns from different tables, including origin, destination, date, time, name, surname1, surname2,
+                and calculates the remaining free seats using a left join with the booking table and a group by clause.
+                The WHERE clause filters the rows based on the provided conditions.
+            -->
+            <AmbiguousColumns>
+                <AmbiguousColumn name="id_trip" prefix="t" />
+            </AmbiguousColumns>
+            <ValidColumns>
+                <Column>origin_title</Column>
+                <Column>origin_address</Column>
+                <Column>destination_titles</Column>
+                <Column>destination_address</Column>
+                <Column>date</Column>
+                <Column>time</Column>
+                <Column>name</Column>
+                <Column>surnames</Column>
+                <Column>email</Column>
+                <Column>free_seats</Column>
+                <Column>id_trip</Column>
+                <Column>id_car</Column>
+                <Column>id_car_brand</Column>
+                <Column>id_car_model</Column>
+                <Column>brand_name</Column>
+                <Column>model_name</Column>
+                <Column>car_registration</Column>
+            </ValidColumns>
+            <Sentence>
+                <![CDATA[
+                    SELECT t.origin_title, t.origin_address, t.destination_title, t.destination_address, t.date, t.time,
+                    tu.name, CONCAT(tu.surname1, ' ',tu.surname2) as surnames, tu.email, (c.seats - count(b.*)) as free_seats, t.id_trip, t.id_car,
+                    c.id_car_brand, c.id_car_model, c.car_registration, cb.brand_name, cm.model_name
+                    FROM trip t
+                    JOIN car c ON t.id_car = c.id_car
+                    JOIN car_brand cb ON c.id_car_brand = cb.id_car_brand
+                    JOIN car_model cm ON c.id_car_model = cm.id_car_model
+                    JOIN tuser tu ON t.id_user = tu.user_
+                    LEFT JOIN booking b ON b.id_trip = t.id_trip
+                    #WHERE#
+                    GROUP BY t.origin_title, t.origin_address, t.destination_title, t.destination_address, t.date, t.time,
+                    tu.name, surnames, tu.email, c.seats, t.id_trip, t.id_car, c.id_car_brand, c.id_car_model, c.car_registration,
+                    cb.brand_name, cm.model_name
+                ]]>
+            </Sentence>
+        </Query>
+        <Query id="trip_detail">
+            <!--
+                Retrieves trip details along with the number of cars for each trip.
+                It selects columns from the trip and car tables, calculates the number of cars using a right join,
+                and groups the results based on the trip ID and user ID.
+                The WHERE clause filters the rows based on the provided conditions.
+            -->
+            <AmbiguousColumns>
+                <AmbiguousColumn name="id_trip" prefix="t" />
+                <AmbiguousColumn name="id_user" prefix="c" />
+            </AmbiguousColumns>
+            <ValidColumns>
+                <Column>origin_title</Column>
+                <Column>origin_address</Column>
+                <Column>destination_titles</Column>
+                <Column>destination_address</Column>
+                <Column>date</Column>
+                <Column>time</Column>
+                <Column>number_cars</Column>
+                <Column>id_trip</Column>
+                <Column>id_user</Column>
+            </ValidColumns>
+            <Sentence>
+                <![CDATA[
+            SELECT count(c.*) as number_cars, t.origin_title, t.origin_address, t.destination_title, t.destination_address, t.date, t.time, t.id_trip, c.id_user
+            FROM trip t
+            RIGHT JOIN car c ON t.id_user = c.id_user
+            #WHERE#
+            GROUP BY t.id_trip, c.id_user
+           ]]>
+            </Sentence>
+        </Query>
+        <Query id="more_trips">
+            <!--
+                Retrieves trip details along with the number of trips for each user.
+                It selects columns from the booking and tuser tables, calculates the number of trips using a join and group by clause,
+                and filters the rows based on the provided conditions.
+            -->
+            <AmbiguousColumns>
+                <AmbiguousColumn name="id_user" prefix="t" />
+            </AmbiguousColumns>
+            <ValidColumns>
+                <Column>more_trips</Column>
+                <Column>id_user</Column>
+                <Column>name</Column>
+            </ValidColumns>
+            <Sentence>
+                <![CDATA[
+                    SELECT count(b.*) as more_trips, b.id_user, tu.name
+                    FROM booking b
+                    JOIN trip t ON b.id_trip = t.id_trip
+                    JOIN tuser tu ON tu.user_ = b.id_user
+                    #WHERE#
+                        AND t.active = true
+                    GROUP BY b.id_user, tu.name
+                    ORDER BY more_trips DESC
+                    LIMIT 3
+                ]]>
+            </Sentence>
+        </Query>
+        <Query id="historical_trips">
+            <!--
+                Retrieves the number of trips for the current month and the previous month.
+                It calculates the number of trips using date range conditions and aggregates the results.
+                The WHERE clause filters the rows based on the provided conditions.
+            -->
+            <ValidColumns>
+                <Column>trips_last_month</Column>
+                <Column>trips_current_month</Column>
+                <Column>id_user</Column>
+                <Column>date</Column>
+            </ValidColumns>
+            <Sentence>
+                <![CDATA[
+                    SELECT
+                        COALESCE(SUM(CASE WHEN t.date BETWEEN DATE_TRUNC('month', CURRENT_DATE)
+                                        AND (DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' - INTERVAL '1 day')
+                                        THEN 1 ELSE 0 END), 0) AS trips_current_month,
+                        COALESCE(SUM(CASE WHEN t.date BETWEEN DATE_TRUNC('month', CURRENT_DATE) - interval '1 month'
+                                        AND (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '1 day')
+                                        THEN 1 ELSE 0 END), 0) AS trips_last_month
+                    FROM trip t
+                    #WHERE#
+                        AND t.active = true
+                ]]>
+            </Sentence>
+        </Query>
+        <Query id="scheduled_trips">
+        <!--
+            Retrieves the number of scheduled trips.
+            It counts the number of trips based on date conditions.
+            The WHERE clause filters the rows based on the provided conditions.
+        -->
+            <ValidColumns>
+                <Column>id_car</Column>
+                <Column>date</Column>
+                <Column>number_trips</Column>
+                <Column>active</Column>
+            </ValidColumns>
+            <Sentence>
+                <![CDATA[
+                    SELECT count(id_trip) as number_trips
+                    FROM trip t
+                    #WHERE#
+                        AND t.date >= CAST(now() as date) AND active = true
+                ]]>
+            </Sentence>
+        </Query>
+        <Query id="number_trips_on_booking">
+        <!--
+            Retrieves the number of trips associated with each booking.
+            It selects the specified columns from the numberbookings table.
+            The WHERE clause filters the rows based on the provided conditions.
+        -->
+            <ValidColumns>
+                <Column>id_trip</Column>
+                <Column>number_bookings</Column>
+            </ValidColumns>
+            <Sentence>
+                <![CDATA[
+                    SELECT
+                    #COLUMNS#
+                    FROM numberbookings
+                    #WHERE#
+                ]]>
+            </Sentence>
+        </Query>
+        <Query id="get_date">
+        <!--
+            Retrieves the date and time for a trip.
+            It selects the date and time columns from the trip table.
+            The WHERE clause filters the rows based on the provided conditions.
+        -->
+            <ValidColumns>
+                <Column>id_trip</Column>
+                <Column>date</Column>
+            </ValidColumns>
+            <Sentence>
+                <![CDATA[
+                    SELECT date, time
+                    FROM trip t
+                    #WHERE#
+                ]]>
+            </Sentence>
+        </Query>
+        <Query id="data_email_passenger">
+        <!--
+            Retrieves data (origin, destination, date, name, email) for a passenger on a trip.
+            It selects the specified columns from the booking, trip, and tuser tables.
+            The WHERE clause filters the rows based on the provided conditions.
+        -->
+            <AmbiguousColumns>
+                <AmbiguousColumn name="id_trip" prefix="b" />
+            </AmbiguousColumns>
+            <ValidColumns>
+                <Column>origin_title</Column>
+                <Column>destination_title</Column>
+                <Column>date</Column>
+                <Column>name</Column>
+                <Column>email</Column>
+                <Column>id_trip</Column>
+            </ValidColumns>
+            <Sentence>
+                <![CDATA[
+                    SELECT b.id_user, tu."name", tu.email, t.origin_title, t.destination_title, t."date"
+                    FROM booking b
+                    JOIN trip t ON b.id_trip = t.id_trip
+                    JOIN tuser tu ON tu.user_ = b.id_user
+                    #WHERE#
+                    ]]>
+            </Sentence>
+        </Query>
+    </Queries>
+</JdbcEntitySetup>

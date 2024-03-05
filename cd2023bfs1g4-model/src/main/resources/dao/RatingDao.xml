@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<JdbcEntitySetup
+        xmlns="http://www.ontimize.com/schema/jdbc"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.ontimize.com/schema/jdbc http://www.ontimize.com/schema/jdbc/ontimize-jdbc-dao.xsd"
+        catalog="" schema="${mainschema}" table="rating"
+        datasource="mainDataSource" sqlhandler="dbSQLStatementHandler">
+    <DeleteKeys>
+        <Column>id_rating</Column>
+    </DeleteKeys>
+    <UpdateKeys>
+        <Column>id_rating</Column>
+    </UpdateKeys>
+    <GeneratedKey>id_rating</GeneratedKey>
+    <Queries>
+        <Query id="is_rated">
+            <!--
+                Retrieves the rating information for a specific user to know if it's already rated.
+                It retrieves the 'rate' column from the 'rating' table.
+                The WHERE clause can be used to apply additional conditions.
+            -->
+            <ValidColumns>
+                <Column>id_user</Column>
+                <Column>id_booking</Column>
+                <Column>rate</Column>
+            </ValidColumns>
+            <Sentence>
+                <![CDATA[
+                        SELECT rate
+                        FROM rating r
+                        #WHERE#
+                ]]>
+            </Sentence>
+        </Query>
+    </Queries>
+</JdbcEntitySetup>

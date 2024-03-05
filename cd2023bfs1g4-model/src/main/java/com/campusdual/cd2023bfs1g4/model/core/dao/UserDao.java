@@ -15,18 +15,17 @@ import com.ontimize.jee.server.dao.jdbc.OntimizeJdbcDaoSupport;
 	configurationFilePlaceholder = "dao/placeholders.properties")
 public class UserDao extends OntimizeJdbcDaoSupport {
 
-	public static final String USR_ID        = "usr_id";
-	public static final String LOGIN         = "usr_login";
-	public static final String EMAIL         = "usr_email";
-	public static final String PASSWORD      = "usr_password";
-	public static final String NAME          = "usr_name";
-	public static final String SURNAME       = "usr_surname";
-	public static final String CREATION_DATE = "usr_creation_date";
-	public static final String DOWN_DATE     = "usr_down_date";
-	public static final String PHOTO         = "usr_photo";
-	public static final String NOTES         = "usr_notes";
-	public static final String PHONE         = "usr_phone";
-	public static final String OLD_PASSWORD  = "old_password";
-	public static final String NEW_PASSWORD  = "new_password";
+    public static final String ID = "user_";
+    public static final String EMAIL = "email";
+    public static final String PASSWORD = "password";
+    public static final String NAME = "name";
+    public static final String SURNAME1 = "surname1";
+    public static final String NIF = "nif";
+    public static final String USERBLOCKED = "userblocked";
+    public static final String LASTPASSWORDUPDATE = "lastpasswordupdate";
+    public static final String FIRSTLOGIN = "firstlogin";
+    public static final String SURNAME2 = "surname2";
+    public static final String QUERY_GET_USER_NAME = "get_user_name";
+    public static final String QUERY_DATA_EMAIL_PASSSENGER = "data_email_passenger";
 
 }
